@@ -1,0 +1,136 @@
+import time
+import os
+RED = '\u001b[41m'
+BLUE = '\u001b[44m'
+WHITE = '\u001b[47m'
+BLACK = '\u001b[40m'
+END = '\u001b[0m'
+
+def draw_finland_flag():
+    width = 36
+    height = 22
+    for i in range(height):
+        row = []
+        for j in range(width):
+            if 11 <= j <= 16 or 9 <= i <= 14:
+                row.append(f"{BLUE}  {END}")
+            else:
+                row.append(f"{WHITE}  {END}")
+        print(''.join(row))
+
+def draw_pattern_i():
+    """使用turtle库绘制两个并排的黑色实心圆"""
+import turtle as t
+t. pencolor('black')
+t. pensize(5)
+t. fillcolor('black')
+t. begin_fill()
+t. circle(80)
+t. penup()
+t. goto(165,0)
+t. pendown()
+t. circle(80)
+t. end_fill()
+
+def draw_function_graph():
+    """绘制函数 y = x/2 的图形（第一象限，x∈[0,10]）"""
+    x_values = range(0, 11)
+    y_values = [x / 2 for x in x_values]
+    max_y = max(y_values)
+    graph_height = 9  # 图形高度（行）
+    
+    for i in range(graph_height, 0, -1):
+        row = []
+        for x in x_values:
+            y = y_values[x]
+            # 判断当前行是否需绘制函数点
+            if i <= y * graph_height / max_y:
+                row.append(f"{BLUE}* {END}")
+            else:
+                row.append("  ")
+        print(''.join(row))
+    # 绘制x轴
+    print(f"{BLUE}" + "-" * (len(x_values) * 2) + f"{END}")
+
+def analyze_sequence():
+    pass
+def loading():
+    for i in range(100):
+        time.sleep(0.05)
+        print(f'\u001b[100DLoading... {i+1}%', end='', flush=True)
+    print(' Done!')
+
+print(f'{BLUE}开始读取sequence.txt...{END}')
+loading()
+file = open(r'C:\Users\Lenovo\Downloads\Telegram Desktop\新建文件夹\sequence.txt', 'r', encoding='latin-1')
+data_list = []
+for line in file:
+    clean_line = line.strip()
+    if clean_line:
+        data_list.append(float(clean_line))
+file.close()
+print(f'\n{WHITE}成功读取 {len(data_list)} 个数值{END}\n')
+
+count_5_10 = 0
+count_neg5_neg10 = 0
+total = len(data_list)
+for num in data_list:
+    if 5 <= num <= 10:
+        count_5_10 += 1
+    elif -10 <= num <= -5:
+        count_neg5_neg10 += 1
+count_others = total - count_5_10 - count_neg5_neg10
+
+percent_5_10 = round((count_5_10 / total) * 100, 2)
+percent_neg5_neg10 = round((count_neg5_neg10 / total) * 100, 2)
+percent_others = round((count_others / total) * 100, 2)
+
+def draw_percent_diagram():
+    print(f'{BLACK}=== 选题9：数值区间百分比对比图 ==={END}')
+    chart_width = 50
+    offset = 2
+    sections = [
+        ("5-10区间", BLUE, percent_5_10),
+        ("-5--10区间", RED, percent_neg5_neg10),
+        ("其他区间", WHITE, percent_others)
+    ]
+    for label, color, percent in sections:
+        bar_length = int((percent / 100) * chart_width)
+        empty_length = chart_width - bar_length
+        print(f'{" " * offset}{label:<12}', end='')
+        print(f'{color}{" " * bar_length}{END}', end='')
+        print(f'{BLACK}{" " * empty_length} {percent}%{END}')
+    print(f'{" " * offset}{BLUE}  {END}: 5-10区间  |  {RED}  {END}: -5--10区间  |  {WHITE}  {END}: 其他区间')
+    print(f'{" " * offset}{BLACK}总数据量：{total} 个 | 百分比合计：{percent_5_10 + percent_neg5_neg10 + percent_others:.2f}%{END}')
+
+draw_percent_diagram()
+print(f'\n{RED}列表第4到第10个元素（索引3-9）：{data_list[3:10]}{END}')
+def animation():
+    for _ in range(3):
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("Animation Frame 1: Finland Flag")
+        draw_finland_flag()
+        time.sleep(1.5)
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("Animation Frame 1: Finland Flag)")
+        draw_pattern_i()
+        time.sleep(1.5)
+
+if __name__ == "__main__":
+    print("=== Lab 1 - Вариант 9 ===")
+    
+    print("\n【Task 1】Finland Flag")
+    draw_finland_flag()
+    
+    print("\n【Task 2】Pattern (Two Black Solid Circles)")
+    draw_pattern_i()
+    
+    print("\n【Task 3】Function Graph: y = x / 2")
+    draw_function_graph()
+    
+    print("\n【Task 4】Sequence Data Analysis")
+    analyze_sequence()
+    
+    print("\n【Bonus Task】Animation (Flag ↔ Pattern)")
+    input("Press Enter to start animation...")
+    animation()
