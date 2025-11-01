@@ -1,0 +1,114 @@
+from csv import reader
+
+def count_long_titles():
+    flag2 = 0
+    with open(r'C:/Users/Lenovo/OneDrive/Desktop/books.csv', 'r', encoding='cp1251') as f:
+        table = reader(f, delimiter=';')
+        next(table)  
+        for row in table:
+            try:
+                title = row[1]
+                if len(title) > 30:
+                    flag2 += 1
+            except IndexError:
+                continue
+    print(f'Количество книг с длинным названием (>30 символов): {flag2}')
+
+
+def search(table, search_line):
+    flag = 0
+    output = open('result2.txt', "w", encoding="utf-8")
+    for row in table:
+        try:
+           
+            price_str = row[4].replace('руб', '').replace(',', '.').strip()
+            price = float(price_str)
+            if price < 200:
+                continue
+            author = row[3]
+            if find_string(author, search_line) != -1:
+                flag += 1
+                year = row[6].split()[0].split('.')[-1]  
+                print(f"{author} - {row[1]} (Цена: {price} руб, Год: {year})")
+                output.write(f'{author}. {row[1]} - {year} (Цена: {price} руб)\n')
+        except (IndexError, ValueError):
+            continue
+    if flag == 0:
+        print("Не найдено книг, соответствующих условиям (цена ≥200 руб + автор匹配).")
+    output.close()
+
+def generate_references():
+    import random
+    with open(r'C:/Users/Lenovo/OneDrive/Desktop/books.csv', 'r', encoding='cp1251') as f:
+        table = list(reader(f, delimiter=';'))
+        books = table[1:] 
+    sample = random.sample(books, min(20, len(books)))
+    with open('references.txt', 'w', encoding='utf-8') as out:
+        for i, row in enumerate(sample, start=1):
+            try:
+                author = row[3]
+                title = row[1]
+                year = row[6].split()[0].split('.')[-1]
+                out.write(f"{i}. {author}. {title} - {year}\n")
+            except IndexError:
+                continue
+    print("\n✅ Файл references.txt создан (20 библиографических записей).")
+    print("----- Содержимое файла references.txt -----")
+    with open('references.txt', 'r', encoding='utf-8') as check:
+        print(check.read())
+
+def find_string(string, search_line):
+    lower_case = string.lower()
+    index = lower_case.find(search_line.lower())
+    return index
+
+def parse_currency_xml():
+    from xml.dom.minidom import parse
+    try:
+        dom = parse(r'C:/Users/Lenovo/OneDrive/Desktop/currency.xml')
+        root = dom.documentElement
+        valute_nodes = root.getElementsByTagName('Valute')
+        
+        numcode_list = []
+        charcode_list = []
+        
+        for node in valute_nodes:
+            numcode_node = node.getElementsByTagName('NumCode')[0]
+            numcode = numcode_node.firstChild.data.strip()
+            numcode_list.append(numcode)
+            
+            charcode_node = node.getElementsByTagName('CharCode')[0]
+            charcode = charcode_node.firstChild.data.strip()
+            charcode_list.append(charcode)
+        
+        print("\n----- Результат парсинга currency.xml (variant 9) -----")
+        print(f"Список NumCode: {numcode_list}")
+        print(f"Список CharCode: {charcode_list}")
+        
+        with open('currency_result.txt', 'w', encoding='utf-8') as f:
+            f.write("Список NumCode:\n" + '\n'.join(numcode_list) + '\n\n')
+            f.write("Список CharCode:\n" + '\n'.join(charcode_list))
+        print("✅ Файл currency_result.txt с списками NumCode и CharCode создан.")
+    
+    except FileNotFoundError:
+        print("Ошибка: Файл currency.xml не найден.")
+    except IndexError:
+        print("Ошибка: Неверная структура XML файла (отсутствует тег NumCode/CharCode).")
+
+if __name__ == "__main__":
+    while True:
+        search_line = input("\nВведите имя автора для поиска (введите '0' или пустую строку для выхода): ")
+        if search_line in ['0', '']:
+            print("Программа завершена.")
+            break
+        try:
+            with open(r'C:/Users/Lenovo/OneDrive/Desktop/books.csv', 'r', encoding='cp1251', newline='') as csvfile:
+                table = reader(csvfile, delimiter=';')
+                next(table)
+                print("\n----- Результат поиска книг (цена ≥200 руб) -----")
+                search(table, search_line)
+                count_long_titles()
+                generate_references()
+            parse_currency_xml()
+        except FileNotFoundError:
+            print("Ошибка: Файл books.csv не найден.")
